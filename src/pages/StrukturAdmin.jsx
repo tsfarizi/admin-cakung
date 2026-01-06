@@ -1,74 +1,113 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./StrukturAdmin.css";
 import logo from "../assets/logo.png";
 
+const API_URL =
+  "https://cakung-barat-server-1065513777845.asia-southeast2.run.app/api/organization";
+
 /* ================= NODE ================= */
-const Node = ({ data, className, onClick }) => {
+const Node = ({ data, onEdit, onAdd }) => {
   return (
-    <div className={`node ${className}`} onClick={() => onClick(data)}>
+    <div className="node" onClick={onEdit}>
       <div className="photo">
-        {data.photo ? <img src={data.photo} /> : "foto"}
+        {data.photo ? <img src={data.photo} alt="" /> : <span className="photo-label">Foto</span>}
       </div>
+
       <div className="info">
         <div className="name">{data.name}</div>
-        <div className="title">{data.title}</div>
+        <div className="title">{data.position}</div>
       </div>
+
+      <button
+        className="btn-add"
+        onClick={(e) => {
+          e.stopPropagation();
+          onAdd(data.id);
+        }}
+      >
+        +
+      </button>
     </div>
   );
 };
 
 /* ================= MODAL ================= */
-const EditModal = ({ data, onClose, onSave }) => {
-  const fileRef = useRef();
-  const [name, setName] = useState(data.name);
-  const [title, setTitle] = useState(data.title);
-  const [photo, setPhoto] = useState(data.photo);
+const Modal = ({ title, data, onClose, onSave, onDelete }) => {
+  const [name, setName] = useState(data?.name || "");
+  const [position, setPosition] = useState(data?.position || "");
+  const [photo, setPhoto] = useState(data?.photo || "");
 
-  const upload = (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => setPhoto(ev.target.result);
+    reader.onload = () => {
+      const img = new Image();
+      img.src = reader.result;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxSize = 400;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height && width > maxSize) {
+          height = (height * maxSize) / width;
+          width = maxSize;
+        } else if (height > width && height > maxSize) {
+          width = (width * maxSize) / height;
+          height = maxSize;
+        } else if (width > maxSize && width === height) {
+          width = height = maxSize;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        setPhoto(canvas.toDataURL("image/jpeg", 0.8));
+      };
+    };
     reader.readAsDataURL(file);
   };
 
   return (
     <div className="modal-backdrop">
       <div className="modal">
-        <h3>Edit Data</h3>
+        <h3>{title}</h3>
 
-        <label>Nama</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} />
+        <div className="photo-upload-container">
+          <div className="photo-preview-wrapper">
+            {!photo && <span className="photo-label">Foto</span>}
+            {photo && <img src={photo} alt="preview" className="photo-preview" />}
+          </div>
 
-        <label>Jabatan</label>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} />
+          {photo && (
+            <button type="button" className="btn-remove-photo" onClick={() => setPhoto("")}>
+              ✕
+            </button>
+          )}
 
-        <label>Foto</label>
-        <div className="upload-box" onClick={() => fileRef.current.click()}>
-          {photo ? <img src={photo} /> : "Upload Foto"}
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={upload}
-          />
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+        </div>
+
+        <div className="modal-field">
+          <label>Nama</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} />
+        </div>
+
+        <div className="modal-field">
+          <label>Jabatan</label>
+          <input value={position} onChange={(e) => setPosition(e.target.value)} />
         </div>
 
         <div className="modal-actions">
-          <button
-            className="btn-delete"
-            onClick={() => onSave({ ...data, _delete: true })}
-          >
-            Hapus
-          </button>
-          <button className="btn-cancel" onClick={onClose}>Batal</button>
-          <button
-            className="btn-save"
-            onClick={() => onSave({ ...data, name, title, photo })}
-          >
-            Kirim
-          </button>
+          {data && (
+            <button className="btn-delete" onClick={onDelete}>
+              Hapus
+            </button>
+          )}
+          <button onClick={onClose}>Batal</button>
+          <button onClick={() => onSave({ name, position, photo })}>Simpan</button>
         </div>
       </div>
     </div>
@@ -77,160 +116,156 @@ const EditModal = ({ data, onClose, onSave }) => {
 
 /* ================= MAIN ================= */
 export default function StrukturAdmin() {
-  const [nodes, setNodes] = useState([
-    { id: "lurah", name: "", title: "", photo: "" },
+  const [flat, setFlat] = useState([]);
+  const [tree, setTree] = useState([]);
+  const [editNode, setEditNode] = useState(null);
+  const [addParent, setAddParent] = useState(null);
+  const nodeRefs = useRef({});
 
-    { id: "sekretaris", name: "Hariyanti", title: "SEKRETARIS KELURAHAN", photo: "" },
-    { id: "bendahara", name: "Sestia Akbarani", title: "BENDAHARA", photo: "" },
-    { id: "pengurus", name: "Rosemillah Lase", title: "PENGURUS BARANG", photo: "" },
+  const buildTree = (data) => {
+    const map = {};
+    data.forEach((n) => (map[n.id] = { ...n, children: [] }));
+    data.forEach((n) => {
+      if (map[n.parent_id]) map[n.parent_id].children.push(map[n.id]);
+    });
+    return data.filter((n) => !map[n.parent_id]).map((n) => map[n.id]);
+  };
 
-    { id: "kasipemerintahan", name: "Ricki Sugiarto", title: "KASI PEMERINTAHAN", photo: "" },
-    { id: "kasiekopem", name: "", title: "KASI EKONOMI PEMBANGUNAN", photo: "" },
-    { id: "plkb", name: "Tri Hastuti", title: "KASI KESEJAHTERAAN RAKYAT", photo: "" },
-    { id: "gulkarmat", name: "Mufti Ashari", title: "STAF PEMERINTAHAN", photo: "" },
-    { id: "satpolpp", name: "Indra Sukaca", title: "STAF EKONOMI PEMBANGUNAN", photo: "" },
-    { id: "ptsp", name: "Anttonius Kharisma", title: "STAF KESEJAHTERAAN RAKYAT", photo: "" },
+  const getConnections = (nodes) => {
+    const connections = [];
+    const traverse = (node) => {
+      node.children.forEach((child) => {
+        connections.push({ parentId: node.id, childId: child.id });
+        traverse(child);
+      });
+    };
+    nodes.forEach(traverse);
+    return connections;
+  };
 
-    { id: "kesejahteraan", name: "", title: "", photo: "" },
-    { id: "pemerintahan", name: "", title: "", photo: "" },
-    { id: "ekonomi", name: "", title: "", photo: "" },
-
-    { id: "staf-dwiana", name: "", title: "", photo: "" },
-    { id: "staf-agus", name: "", title: "", photo: "" },
-    { id: "staf-emma", name: "", title: "", photo: "" }
-  ]);
-
-  const [active, setActive] = useState(null);
-
-  /* =====================================================
-     API READ (GET) — ambil data dari backend
-     ===================================================== */
   useEffect(() => {
-    fetch("https://cakung-barat-server-1065513777845.asia-southeast2.run.app/api/organization")
-      .then(res => res.json())
-      .then(data => {
-        if (!data || data.length === 0) return;
-
-        const lurah = data[0];
-
-        setNodes(prev =>
-          prev.map(n =>
-            n.id === "lurah"
-              ? {
-                  ...n,
-                  name: lurah.name,
-                  title: lurah.position,
-                  photo: lurah.photo
-                }
-              : n
-          )
-        );
-      })
-      .catch(err => console.error("API GET error:", err));
+    fetch(API_URL)
+      .then((r) => r.json())
+      .then((data) => {
+        setFlat(data);
+        setTree(buildTree(data));
+      });
   }, []);
 
-  /* =====================================================
-     API UPDATE (PUT) — hanya node lurah
-     ===================================================== */
-  const saveNode = (updated) => {
+  const saveEdit = ({ name, position, photo }) => {
+    fetch(`${API_URL}/${editNode.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, position, photo }),
+    }).then(() => {
+      const updated = flat.map((n) =>
+        n.id === editNode.id ? { ...n, name, position, photo } : n
+      );
+      setFlat(updated);
+      setTree(buildTree(updated));
+      setEditNode(null);
+    });
+  };
 
-  /* ===== DELETE API ===== */
-  if (updated._delete && updated.id === "lurah") {
-    fetch(
-      "https://cakung-barat-server-1065513777845.asia-southeast2.run.app/api/organization/1",
-      {
-        method: "DELETE"
-      }
-    )
-      .then(() => {
-        setNodes(prev =>
-          prev.map(n =>
-            n.id === "lurah"
-              ? { ...n, name: "", title: "", photo: "" }
-              : n
-          )
-        );
+  const deleteNode = (id) => {
+    if (!window.confirm("Yakin hapus data ini?")) return;
+    fetch(`${API_URL}/${id}`, { method: "DELETE" }).then(() => {
+      const updated = flat.filter((n) => n.id !== id);
+      setFlat(updated);
+      setTree(buildTree(updated));
+      setEditNode(null);
+    });
+  };
+
+  const saveAdd = ({ name, position, photo }) => {
+    const parentNode = flat.find((n) => n.id === addParent);
+    const level = parentNode ? parentNode.level + 1 : 1;
+    const role = "user";
+
+    fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        position,
+        photo,
+        parent_id: addParent || 0,
+        level,
+        role,
+      }),
+    })
+      .then(async (r) => {
+        const text = await r.text();
+        console.log("Server response:", text);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return JSON.parse(text);
       })
-      .catch(err => console.error("API DELETE error:", err));
+      .then((newNode) => {
+        const updated = [...flat, newNode];
+        setFlat(updated);
+        setTree(buildTree(updated));
+        setAddParent(null);
+      })
+      .catch((err) => {
+        console.error("POST error:", err);
+        alert("Gagal menambah data. Cek console untuk detail.");
+      });
+  };
 
-    setActive(null);
-    return;
-  }
+  const renderTree = (n) => (
+    <div
+      key={n.id}
+      className="tree-node"
+      ref={(el) => {
+        if (el) nodeRefs.current[n.id] = el;
+      }}
+    >
+      <Node data={n} onEdit={() => setEditNode(n)} onAdd={(id) => setAddParent(id)} />
+      {n.children.length > 0 && <div className="children">{n.children.map(renderTree)}</div>}
+    </div>
+  );
 
-  /* ===== UPDATE API ===== */
-  if (updated.id === "lurah") {
-    fetch(
-      "https://cakung-barat-server-1065513777845.asia-southeast2.run.app/api/organization/1",
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: updated.name,
-          position: updated.title,
-          photo: updated.photo
-        })
-      }
-    ).catch(err => console.error("API PUT error:", err));
-  }
-
-  setNodes(prev => prev.map(n => n.id === updated.id ? updated : n));
-  setActive(null);
-};
-
-
-  const getNode = (id) => nodes.find(n => n.id === id);
+  const connections = getConnections(tree);
 
   return (
     <div className="container">
       <img src={logo} className="logo" />
-      <h1>STRUKTUR ORGANISASI KELURAHAN CAKUNG BARAT</h1>
+      <h1>STRUKTUR ORGANISASI</h1>
 
-      <div className="chart-scroll">
-        <div className="org-chart">
+      <svg className="lines-svg">
+        {connections.map((conn, i) => {
+          const parentEl = nodeRefs.current[conn.parentId];
+          const childEl = nodeRefs.current[conn.childId];
+          if (!parentEl || !childEl) return null;
+          const pr = parentEl.getBoundingClientRect();
+          const cr = childEl.getBoundingClientRect();
+          return (
+            <line
+              key={i}
+              x1={pr.left + pr.width / 2}
+              y1={pr.top + pr.height / 2}
+              x2={cr.left + cr.width / 2}
+              y2={cr.top + cr.height / 2}
+              stroke="#333"
+              strokeWidth="2"
+            />
+          );
+        })}
+      </svg>
 
-          <Node className="node-lurah" data={getNode("lurah")} onClick={setActive} />
+      <div className="org-chart">{tree.map(renderTree)}</div>
 
-          <Node className="node-sekretaris" data={getNode("sekretaris")} onClick={setActive} />
-          <Node className="node-bendahara" data={getNode("bendahara")} onClick={setActive} />
-          <Node className="node-pengurus" data={getNode("pengurus")} onClick={setActive} />
-
-          <Node className="node-kasipemerintahan" data={getNode("kasipemerintahan")} onClick={setActive} />
-          <Node className="node-kasiekopem" data={getNode("kasiekopem")} onClick={setActive} />
-          <Node className="node-plkb" data={getNode("plkb")} onClick={setActive} />
-          <Node className="node-gulkarmat" data={getNode("gulkarmat")} onClick={setActive} />
-          <Node className="node-satpolpp" data={getNode("satpolpp")} onClick={setActive} />
-          <Node className="node-ptsp" data={getNode("ptsp")} onClick={setActive} />
-
-          <Node className="node-kesejahteraan" data={getNode("kesejahteraan")} onClick={setActive} />
-          <Node className="node-pemerintahan" data={getNode("pemerintahan")} onClick={setActive} />
-          <Node className="node-ekonomi" data={getNode("ekonomi")} onClick={setActive} />
-
-          <Node className="node-staf-dwiana" data={getNode("staf-dwiana")} onClick={setActive} />
-          <Node className="node-staf-agus" data={getNode("staf-agus")} onClick={setActive} />
-          <Node className="node-staf-emma" data={getNode("staf-emma")} onClick={setActive} />
-
-          <div className="lines">
-            {[
-              "line-1","line-2","line-3","line-4","line-5","line-6",
-              "line-7","line-8","line-9","line-10",
-              "line-11-kasipemerintahan","line-11-kasiekopem","line-11-plkb",
-              "line-11-gulkarmat","line-11-satpolpp","line-11-ptsp",
-              "line-13","line-15","line-12","line-14",
-              "line-16","line-17",
-              "line-18-dwiana","line-18-agus","line-18-emma"
-            ].map(l => <div key={l} className={`line ${l}`} />)}
-          </div>
-
-        </div>
-      </div>
-
-      {active && (
-        <EditModal
-          data={active}
-          onClose={() => setActive(null)}
-          onSave={saveNode}
+      {editNode && (
+        <Modal
+          title="Edit Data"
+          data={editNode}
+          onClose={() => setEditNode(null)}
+          onSave={saveEdit}
+          onDelete={() => deleteNode(editNode.id)}
         />
       )}
+
+      {addParent && <Modal title="Tambah Anggota" onClose={() => setAddParent(null)} onSave={saveAdd} />}
     </div>
   );
 }
