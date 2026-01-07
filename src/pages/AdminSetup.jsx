@@ -7,7 +7,7 @@ import './AdminSetup.css';
 
 export default function AdminSetup() {
     const navigate = useNavigate();
-    const { authFetch, setupMode, logout } = useAuth();
+    const { authFetch, setupMode, isAuthenticated, isLoading: authLoading, logout } = useAuth();
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -19,11 +19,14 @@ export default function AdminSetup() {
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
-        if (!setupMode) {
-            // Not in setup mode, redirect to login
+        // Wait for auth to finish loading before checking
+        if (authLoading) return;
+
+        // If not authenticated or not in setup mode, redirect to login
+        if (!isAuthenticated || !setupMode) {
             navigate('/login');
         }
-    }, [setupMode, navigate]);
+    }, [setupMode, isAuthenticated, authLoading, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

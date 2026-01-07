@@ -6,7 +6,7 @@ import './Login.css';
 
 export default function Login() {
     const navigate = useNavigate();
-    const { login, isAuthenticated, authStatus, checkAuthStatus } = useAuth();
+    const { login, isAuthenticated, setupMode, checkAuthStatus } = useAuth();
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -14,6 +14,7 @@ export default function Login() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSetupMode, setIsSetupMode] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         checkAuthStatus().then(status => {
@@ -23,16 +24,18 @@ export default function Login() {
         });
     }, [checkAuthStatus]);
 
+    // Only redirect to home if authenticated and NOT in setup mode and NOT currently submitting
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated && !setupMode && !isSubmitting) {
             navigate('/');
         }
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, setupMode, isSubmitting, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setIsLoading(true);
+        setIsSubmitting(true);
 
         const result = await login(username, password);
 
@@ -45,6 +48,7 @@ export default function Login() {
             }
         } else {
             setError(result.error);
+            setIsSubmitting(false);
         }
 
         setIsLoading(false);
