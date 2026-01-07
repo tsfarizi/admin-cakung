@@ -1,4 +1,41 @@
 /* Admin Management Page Styles */
+
+/* CSS Variables for Theme Support */
+:root {
+    --am-bg-primary: #f8fafc;
+    --am-bg-card: #ffffff;
+    --am-text-primary: #1e293b;
+    --am-text-secondary: #64748b;
+    --am-text-muted: #94a3b8;
+    --am-border-color: #e2e8f0;
+    --am-table-header-bg: #f8fafc;
+    --am-table-row-hover: #f8fafc;
+    --am-input-bg: #f8fafc;
+    --am-error-bg: #fef2f2;
+    --am-error-border: #fecaca;
+    --am-error-text: #dc2626;
+    --am-badge-bg: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    --am-badge-text: #4f46e5;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --am-bg-primary: #0f172a;
+    --am-bg-card: #1e293b;
+    --am-text-primary: #f1f5f9;
+    --am-text-secondary: #94a3b8;
+    --am-text-muted: #64748b;
+    --am-border-color: #334155;
+    --am-table-header-bg: #0f172a;
+    --am-table-row-hover: #334155;
+    --am-input-bg: #0f172a;
+    --am-error-bg: #450a0a;
+    --am-error-border: #7f1d1d;
+    --am-error-text: #fca5a5;
+    --am-badge-bg: linear-gradient(135deg, #312e81, #3730a3);
+    --am-badge-text: #a5b4fc;
+}
+
 .admin-management {
     padding: 24px;
     max-width: 1000px;
@@ -18,7 +55,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    color: #1e293b;
+    color: var(--am-text-primary);
 }
 
 .header-left h1 {
@@ -29,7 +66,7 @@
 
 .header-left p {
     font-size: 14px;
-    color: #64748b;
+    color: var(--am-text-secondary);
     margin: 0;
 }
 
@@ -60,10 +97,10 @@
     align-items: center;
     gap: 12px;
     padding: 14px 18px;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+    background: var(--am-error-bg);
+    border: 1px solid var(--am-error-border);
     border-radius: 12px;
-    color: #dc2626;
+    color: var(--am-error-text);
     margin-bottom: 20px;
 }
 
@@ -97,7 +134,7 @@
 .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid #e2e8f0;
+    border: 3px solid var(--am-border-color);
     border-top-color: #3b82f6;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -110,15 +147,16 @@
 }
 
 .loading-state p {
-    color: #64748b;
+    color: var(--am-text-secondary);
 }
 
 /* Table */
 .admin-table-wrapper {
-    background: white;
+    background: var(--am-bg-card);
     border-radius: 16px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    border: 1px solid var(--am-border-color);
 }
 
 .admin-table {
@@ -129,20 +167,20 @@
 .admin-table th {
     text-align: left;
     padding: 16px 20px;
-    background: #f8fafc;
+    background: var(--am-table-header-bg);
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #64748b;
-    border-bottom: 1px solid #e2e8f0;
+    color: var(--am-text-secondary);
+    border-bottom: 1px solid var(--am-border-color);
 }
 
 .admin-table td {
     padding: 16px 20px;
     font-size: 14px;
-    color: #1e293b;
-    border-bottom: 1px solid #f1f5f9;
+    color: var(--am-text-primary);
+    border-bottom: 1px solid var(--am-border-color);
 }
 
 .admin-table tr:last-child td {
@@ -150,16 +188,16 @@
 }
 
 .admin-table tr:hover {
-    background: #f8fafc;
+    background: var(--am-table-row-hover);
 }
 
 .username-badge {
     display: inline-block;
     padding: 4px 10px;
-    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    background: var(--am-badge-bg);
     border-radius: 6px;
     font-weight: 600;
-    color: #4f46e5;
+    color: var(--am-badge-text);
     font-size: 13px;
 }
 
@@ -169,19 +207,19 @@
     background: transparent;
     border-radius: 8px;
     cursor: pointer;
-    color: #64748b;
+    color: var(--am-text-secondary);
     transition: all 0.2s;
 }
 
 .btn-delete:hover {
-    background: #fef2f2;
-    color: #dc2626;
+    background: var(--am-error-bg);
+    color: var(--am-error-text);
 }
 
 .empty-state {
     text-align: center;
     padding: 40px !important;
-    color: #64748b;
+    color: var(--am-text-secondary);
 }
 
 /* Modal */
@@ -200,10 +238,11 @@
 .modal {
     width: 100%;
     max-width: 400px;
-    background: white;
+    background: var(--am-bg-card);
     border-radius: 16px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     animation: slideIn 0.3s ease-out;
+    border: 1px solid var(--am-border-color);
 }
 
 @keyframes slideIn {
@@ -223,13 +262,13 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px 24px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--am-border-color);
 }
 
 .modal-header h3 {
     font-size: 18px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--am-text-primary);
     margin: 0;
 }
 
@@ -239,12 +278,12 @@
     background: transparent;
     border-radius: 8px;
     cursor: pointer;
-    color: #64748b;
+    color: var(--am-text-secondary);
 }
 
 .btn-close:hover {
-    background: #f1f5f9;
-    color: #1e293b;
+    background: var(--am-table-row-hover);
+    color: var(--am-text-primary);
 }
 
 .modal-error {
@@ -253,9 +292,9 @@
     gap: 8px;
     margin: 16px 24px 0;
     padding: 10px 14px;
-    background: #fef2f2;
+    background: var(--am-error-bg);
     border-radius: 8px;
-    color: #dc2626;
+    color: var(--am-error-text);
     font-size: 13px;
 }
 
@@ -271,7 +310,7 @@
     display: block;
     font-size: 13px;
     font-weight: 500;
-    color: #1e293b;
+    color: var(--am-text-primary);
     margin-bottom: 6px;
 }
 
@@ -279,23 +318,23 @@
 .modal input[type="password"] {
     width: 100%;
     padding: 11px 14px;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid var(--am-border-color);
     border-radius: 10px;
     font-size: 14px;
-    color: #1e293b;
-    background: #f8fafc;
+    color: var(--am-text-primary);
+    background: var(--am-input-bg);
     transition: all 0.2s;
 }
 
 .modal input:focus {
     outline: none;
     border-color: #3b82f6;
-    background: white;
+    background: var(--am-bg-card);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .modal input::placeholder {
-    color: #94a3b8;
+    color: var(--am-text-muted);
 }
 
 .password-input {
@@ -315,7 +354,7 @@
     border: none;
     padding: 4px;
     cursor: pointer;
-    color: #64748b;
+    color: var(--am-text-secondary);
     display: flex;
 }
 
@@ -328,18 +367,18 @@
 
 .btn-cancel {
     padding: 10px 18px;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid var(--am-border-color);
     border-radius: 10px;
     background: transparent;
-    color: #64748b;
+    color: var(--am-text-secondary);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
 }
 
 .btn-cancel:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
+    background: var(--am-table-row-hover);
+    border-color: var(--am-text-muted);
 }
 
 .btn-submit {

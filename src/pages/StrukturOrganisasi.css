@@ -84,9 +84,9 @@
 
 .canvas {
   position: relative;
-  background: 
-    linear-gradient(90deg, #f1f5f9 1px, transparent 1px),
-    linear-gradient(#f1f5f9 1px, transparent 1px);
+  background:
+    linear-gradient(90deg, var(--canvas-grid) 1px, transparent 1px),
+    linear-gradient(var(--canvas-grid) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
@@ -268,6 +268,7 @@
 }
 
 .connector-line {
+  stroke: var(--connector-color);
   opacity: 0.6;
   transition: opacity 0.2s;
 }
@@ -310,6 +311,7 @@
     padding: 16px;
     border-radius: 50%;
   }
+
   .btn-floating span {
     display: none;
   }
@@ -344,6 +346,7 @@
     opacity: 0;
     transform: translateY(20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -555,6 +558,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
