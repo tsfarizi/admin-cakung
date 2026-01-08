@@ -1,0 +1,415 @@
+/* Admin Management Page Styles */
+
+/* CSS Variables for Theme Support */
+:root {
+    --am-bg-primary: #f8fafc;
+    --am-bg-card: #ffffff;
+    --am-text-primary: #1e293b;
+    --am-text-secondary: #64748b;
+    --am-text-muted: #94a3b8;
+    --am-border-color: #e2e8f0;
+    --am-table-header-bg: #f8fafc;
+    --am-table-row-hover: #f8fafc;
+    --am-input-bg: #f8fafc;
+    --am-error-bg: #fef2f2;
+    --am-error-border: #fecaca;
+    --am-error-text: #dc2626;
+    --am-badge-bg: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    --am-badge-text: #4f46e5;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --am-bg-primary: #0f172a;
+    --am-bg-card: #1e293b;
+    --am-text-primary: #f1f5f9;
+    --am-text-secondary: #94a3b8;
+    --am-text-muted: #64748b;
+    --am-border-color: #334155;
+    --am-table-header-bg: #0f172a;
+    --am-table-row-hover: #334155;
+    --am-input-bg: #0f172a;
+    --am-error-bg: #450a0a;
+    --am-error-border: #7f1d1d;
+    --am-error-text: #fca5a5;
+    --am-badge-bg: linear-gradient(135deg, #312e81, #3730a3);
+    --am-badge-text: #a5b4fc;
+}
+
+.admin-management {
+    padding: 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--am-text-primary);
+}
+
+.header-left h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.header-left p {
+    font-size: 14px;
+    color: var(--am-text-secondary);
+    margin: 0;
+}
+
+.btn-add {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+/* Error Banner */
+.error-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--am-error-bg);
+    border: 1px solid var(--am-error-border);
+    border-radius: 12px;
+    color: var(--am-error-text);
+    margin-bottom: 20px;
+}
+
+.error-banner span {
+    flex: 1;
+}
+
+.error-banner button {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+}
+
+.error-banner button:hover {
+    opacity: 1;
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    gap: 16px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--am-border-color);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-state p {
+    color: var(--am-text-secondary);
+}
+
+/* Table */
+.admin-table-wrapper {
+    background: var(--am-bg-card);
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid var(--am-border-color);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 16px 20px;
+    background: var(--am-table-header-bg);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--am-text-secondary);
+    border-bottom: 1px solid var(--am-border-color);
+}
+
+.admin-table td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--am-text-primary);
+    border-bottom: 1px solid var(--am-border-color);
+}
+
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table tr:hover {
+    background: var(--am-table-row-hover);
+}
+
+.username-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--am-badge-bg);
+    border-radius: 6px;
+    font-weight: 600;
+    color: var(--am-badge-text);
+    font-size: 13px;
+}
+
+.btn-delete {
+    padding: 8px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--am-text-secondary);
+    transition: all 0.2s;
+}
+
+.btn-delete:hover {
+    background: var(--am-error-bg);
+    color: var(--am-error-text);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px !important;
+    color: var(--am-text-secondary);
+}
+
+/* Modal */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal {
+    width: 100%;
+    max-width: 400px;
+    background: var(--am-bg-card);
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: slideIn 0.3s ease-out;
+    border: 1px solid var(--am-border-color);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--am-border-color);
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--am-text-primary);
+    margin: 0;
+}
+
+.btn-close {
+    padding: 6px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--am-text-secondary);
+}
+
+.btn-close:hover {
+    background: var(--am-table-row-hover);
+    color: var(--am-text-primary);
+}
+
+.modal-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 24px 0;
+    padding: 10px 14px;
+    background: var(--am-error-bg);
+    border-radius: 8px;
+    color: var(--am-error-text);
+    font-size: 13px;
+}
+
+.modal form {
+    padding: 24px;
+}
+
+.modal .form-group {
+    margin-bottom: 18px;
+}
+
+.modal label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--am-text-primary);
+    margin-bottom: 6px;
+}
+
+.modal input[type="text"],
+.modal input[type="password"] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--am-border-color);
+    border-radius: 10px;
+    font-size: 14px;
+    color: var(--am-text-primary);
+    background: var(--am-input-bg);
+    transition: all 0.2s;
+}
+
+.modal input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: var(--am-bg-card);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modal input::placeholder {
+    color: var(--am-text-muted);
+}
+
+.password-input {
+    position: relative;
+}
+
+.password-input input {
+    padding-right: 40px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--am-text-secondary);
+    display: flex;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancel {
+    padding: 10px 18px;
+    border: 1.5px solid var(--am-border-color);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--am-text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-cancel:hover {
+    background: var(--am-table-row-hover);
+    border-color: var(--am-text-muted);
+}
+
+.btn-submit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.loading-spinner-sm {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
